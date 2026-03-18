@@ -1,9 +1,9 @@
 ---
 name: portfolio
 description: |
-  이력서를 기반으로 Gamma API를 활용해 포트폴리오 웹페이지를 자동 생성합니다.
-  취업 준비생이 이력서를 붙여넣거나 파일로 제공하면, 전문적인 포트폴리오 웹페이지/프레젠테이션/문서를 만들어줍니다.
-  사용법: /portfolio 입력 후 안내에 따라 이력서를 제공하세요.
+  Generate a professional portfolio webpage from a resume using the Gamma API.
+  Paste or provide a resume file, choose a format and style, and get a polished portfolio in seconds.
+  Usage: type /portfolio and follow the prompts.
 allowed-tools:
   - Bash
   - Read
@@ -13,78 +13,117 @@ allowed-tools:
 
 # Portfolio Generator (Gamma API)
 
-이력서를 기반으로 Gamma API를 활용해 전문적인 포트폴리오를 자동 생성하는 스킬입니다.
+Generate a professional portfolio from a resume using the Gamma API.
 
-## Step 1: API 키 확인 및 설정
+## Step 1: Check API Key
 
 ```bash
 echo "${GAMMA_API_KEY:+set}"
 ```
 
-**API 키가 설정되어 있지 않은 경우**, 사용자에게 안내합니다:
+If not set, guide the user:
 
-> Gamma API 키가 필요합니다.
+> You need a Gamma API key.
 >
-> 1. https://gamma.app > 프로필 > **Account Settings** > **API Keys** > **Create API Key**
-> 2. **필요 플랜:** Pro, Ultra, Teams, 또는 Business
+> 1. Go to https://gamma.app > Profile > **Account Settings** > **API Keys** > **Create API Key**
+> 2. **Required plan:** Pro, Ultra, Teams, or Business
 >
-> 설정 방법: `export GAMMA_API_KEY="발급받은_키"`
+> Set it: `export GAMMA_API_KEY="your_key"`
 
-AskUserQuestion으로 API 키 입력을 받습니다. Other 란에 직접 입력한 경우 환경변수로 설정합니다.
-**중요: API 키를 절대 화면에 출력하거나 로그에 남기지 마세요.**
+Use AskUserQuestion to collect the key. If entered in the Other field, set it as an environment variable.
+**IMPORTANT: Never print or log the API key.**
 
-## Step 2: 이력서 수집
+## Step 2: Collect Resume
 
-AskUserQuestion으로 이력서 입력 방식을 물어봅니다:
+Use AskUserQuestion:
 
-1. **텍스트 붙여넣기** — 다음 메시지에 이력서 텍스트를 직접 붙여넣기
-2. **파일 경로 제공** — 이력서 파일(.txt, .md, .pdf) 경로를 입력
+1. **Paste text** — paste resume text in the next message
+2. **Provide file path** — path to a resume file (.txt, .md, .pdf)
 
-이력서 내용이 100자 미만이면 다시 요청합니다.
+If the resume is under 100 characters, ask again.
 
-## Step 3: 포트폴리오 옵션 선택
+**Language detection:** After receiving the resume, detect its primary language (e.g. Korean, English, Japanese, Chinese). This determines the `textOptions.language` value and the language of the inputText prompt in Step 4.
 
-AskUserQuestion으로 2개의 질문을 동시에 물어봅니다:
+## Step 3: Choose Options
 
-**질문 1 — 출력 형식:**
-- 웹페이지 (Recommended)
-- 프레젠테이션
-- 문서
+Use AskUserQuestion with 2 questions:
 
-**질문 2 — 스타일:**
-- 전문적 (Recommended)
-- 캐주얼
-- 창의적
+**Question 1 — Format:**
+- Webpage (Recommended)
+- Presentation
+- Document
 
-## Step 4: Gamma API 호출
+**Question 2 — Style:**
+- Professional (Recommended)
+- Casual
+- Creative
 
-### 파라미터 매핑
+## Step 4: Call Gamma API
 
-**format 매핑:**
+### Parameter Mapping
 
-| 선택 | format |
-|------|--------|
-| 웹페이지 | `webpage` |
-| 프레젠테이션 | `presentation` |
-| 문서 | `document` |
+**Format:**
 
-**스타일 → tone + themeId 매핑:**
+| Selection | format |
+|-----------|--------|
+| Webpage | `webpage` |
+| Presentation | `presentation` |
+| Document | `document` |
 
-| 선택 | tone | themeId |
-|------|------|---------|
-| 전문적 | `professional, confident` | `commons` |
-| 캐주얼 | `casual, friendly` | `gamma` |
-| 창의적 | `creative, bold` | `electric` |
+**Style → tone + themeId:**
 
-### API 호출
+| Selection | tone | themeId |
+|-----------|------|---------|
+| Professional | `professional, confident` | `commons` |
+| Casual | `casual, friendly` | `gamma` |
+| Creative | `creative, bold` | `electric` |
 
-python3을 사용하여 JSON을 안전하게 구성하고 호출합니다:
+**Language → textOptions.language + inputText prompt:**
 
-```bash
-python3 -c "
-import json, subprocess, sys
+| Detected Language | language | inputText language |
+|-------------------|----------|--------------------|
+| Korean | `ko` | Korean |
+| English | `en` | English |
+| Japanese | `ja` | Japanese |
+| Chinese | `zh` | Chinese |
+| Other | ISO 639-1 code | Match resume language |
 
-input_text = '''다음 이력서를 기반으로 포트폴리오를 만들어주세요.
+### API Call
+
+Build the JSON payload and call the API using python3.
+
+The `inputText` prompt must be written in the **detected resume language**. Below are templates for English and Korean. For other languages, translate the English template accordingly.
+
+**English inputText (when resume is in English):**
+
+```
+Create a portfolio based on the following resume.
+
+Sections:
+
+Hero: Name, title, one-line summary, contact links
+---
+About Me: 3 key strengths
+---
+Experience: Timeline format
+---
+Key Projects: Card format, results-focused
+---
+Expertise: List of key skills
+---
+Education & Certifications
+---
+Contact
+
+Resume:
+---
+{resume_content}
+```
+
+**Korean inputText (when resume is in Korean):**
+
+```
+다음 이력서를 기반으로 포트폴리오를 만들어주세요.
 
 섹션 구성:
 
@@ -104,9 +143,24 @@ Expertise: 핵심 키워드 나열
 
 이력서:
 ---
-RESUME_CONTENT_HERE'''
+{resume_content}
+```
 
-additional = '''텍스트는 간결하게 작성해주세요. em dash, 가운뎃점, 이모지는 사용하지 마세요. 텍스트와 시각 요소의 균형을 맞춰주세요.'''
+**additionalInstructions (same for all languages):**
+
+```
+Keep text concise. Do not use em dashes, middle dots, or emojis. Balance text and visual elements.
+```
+
+**Full API call:**
+
+```bash
+python3 -c "
+import json, subprocess, sys
+
+input_text = '''INPUT_TEXT_HERE'''
+
+additional = '''Keep text concise. Do not use em dashes, middle dots, or emojis. Balance text and visual elements.'''
 
 payload = {
     'inputText': input_text,
@@ -119,7 +173,7 @@ payload = {
         'tone': 'TONE_HERE',
         'audience': 'hiring managers and recruiters',
         'amount': 'medium',
-        'language': 'ko'
+        'language': 'LANG_HERE'
     },
     'imageOptions': {
         'source': 'aiGenerated',
@@ -140,18 +194,18 @@ print(result.stdout)
 " "\$GAMMA_API_KEY"
 ```
 
-**RESUME_CONTENT_HERE**, **FORMAT_HERE**, **THEME_HERE**, **TONE_HERE** 를 Step 3에서 선택된 값으로 교체합니다.
+Replace **INPUT_TEXT_HERE** with the language-appropriate inputText template (with resume inserted), and **FORMAT_HERE**, **THEME_HERE**, **TONE_HERE**, **LANG_HERE** with values from the mapping tables above.
 
-### 응답 처리
+### Response Handling
 
-응답에서 `generationId`를 추출합니다. 에러 시:
-- 401: "API 키가 유효하지 않습니다."
-- 402: "크레딧이 부족합니다."
-- 429: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요."
+Extract `generationId` from the response. On error:
+- 401: "Invalid API key."
+- 402: "Insufficient credits."
+- 429: "Too many requests. Please try again later."
 
-## Step 5: 폴링 및 결과 확인
+## Step 5: Poll for Result
 
-"포트폴리오를 생성하고 있습니다... (보통 30초~2분 소요)" 메시지 표시 후, 5초 간격으로 폴링합니다.
+Show "Generating your portfolio... (usually 30s-2min)" then poll every 5 seconds.
 
 ```bash
 for i in $(seq 1 60); do
@@ -175,45 +229,45 @@ for i in $(seq 1 60); do
 done
 ```
 
-## Step 6: 결과 안내
+## Step 6: Show Result
 
-### 성공 시
+### On success
 
 ```
-포트폴리오가 성공적으로 생성되었습니다!
+Your portfolio is ready!
 
-포트폴리오 보기: {gammaUrl}
-PDF 다운로드: {exportUrl}
+View: {gammaUrl}
+Download PDF: {exportUrl}
 
-Gamma 에디터에서 텍스트, 이미지, 레이아웃을 자유롭게 수정할 수 있습니다.
+You can edit text, images, and layout in the Gamma editor.
 ```
 
-### 실패 시
+### On failure
 
-에러 원인을 분석하여 안내하고 재시도 여부를 물어봅니다.
+Analyze the error and ask if the user wants to retry.
 
-### 타임아웃 시 (5분 초과)
+### On timeout (over 5 min)
 
 ```
 Generation ID: {generationId}
-나중에 https://gamma.app 내 문서에서 확인할 수 있습니다.
+Check back later at https://gamma.app in your documents.
 ```
 
-## 에러 처리 요약
+## Error Reference
 
-| 상황 | 대응 |
-|------|------|
-| API 키 미설정 | 설정 가이드 안내 |
-| 401 | 키 재확인 안내 |
-| 402 | Gamma 대시보드에서 크레딧 충전 안내 |
-| 429 | 잠시 후 재시도 안내 |
-| 이력서 부족 | 이력서 보강 안내 |
-| 생성 실패 | 에러 분석 + 재시도 제안 |
+| Error | Action |
+|-------|--------|
+| Key not set | Show setup guide |
+| 401 | Ask to verify API key |
+| 402 | Direct to Gamma dashboard to add credits |
+| 429 | Wait and retry |
+| Resume too short | Ask for more detail |
+| Generation failed | Analyze error + offer retry |
 
-## 참고사항
+## Notes
 
-- Gamma Pro, Ultra, Teams, 또는 Business 플랜 필요
-- 생성 1회당 Gamma 크레딧 소모
-- API 키: https://gamma.app > Account Settings > API Keys
-- 생성된 포트폴리오는 Gamma 에디터에서 편집 가능
-- export URL은 약 7일 후 만료
+- Requires Gamma Pro, Ultra, Teams, or Business plan
+- Each generation consumes Gamma credits
+- API key: https://gamma.app > Account Settings > API Keys
+- Generated portfolios are editable in Gamma's editor
+- Export URLs expire after ~7 days
