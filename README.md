@@ -20,8 +20,10 @@ Resume-to-portfolio generator powered by the [Gamma API](https://gamma.app). Pro
 
 ## Installation
 
-```bash
-claude /install-plugin https://github.com/jinjin1/gamma-portfolio-plugin
+In a Claude Code session, run:
+
+```
+/plugin add https://github.com/jinjin1/gamma-portfolio-plugin
 ```
 
 Or for local testing:
