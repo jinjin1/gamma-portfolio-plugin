@@ -28,7 +28,7 @@ In a Claude Code session:
 Then install the plugin:
 
 ```
-/plugin install gamma-portfolio@jinjin1-gamma-portfolio-plugin
+/plugin install gamma-portfolio@gamma-portfolio-marketplace
 ```
 
 ### Local testing
