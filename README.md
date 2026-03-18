@@ -5,13 +5,12 @@ Resume-to-portfolio generator powered by the [Gamma API](https://gamma.app). Pro
 ## Features
 
 - Generates portfolio webpages, presentations, or documents from any resume
+- Auto-detects resume language and outputs in the same language
 - Three style presets with optimized Gamma themes:
-  - **Professional** (`commons` theme) — clean and trustworthy
-  - **Casual** (`gamma` theme) — warm and approachable
-  - **Creative** (`electric` theme) — bold and vibrant
-- Korean language support by default
+  - **Professional** (`commons` theme)
+  - **Casual** (`gamma` theme)
+  - **Creative** (`electric` theme)
 - Automatic PDF export
-- Section-based card layout with `inputTextBreaks`
 
 ## Prerequisites
 
@@ -20,15 +19,22 @@ Resume-to-portfolio generator powered by the [Gamma API](https://gamma.app). Pro
 
 ## Installation
 
-In a Claude Code session, run:
+In a Claude Code session:
 
 ```
-/plugin add https://github.com/jinjin1/gamma-portfolio-plugin
+/plugin marketplace add jinjin1/gamma-portfolio-plugin
 ```
 
-Or for local testing:
+Then install the plugin:
+
+```
+/plugin install gamma-portfolio@jinjin1-gamma-portfolio-plugin
+```
+
+### Local testing
 
 ```bash
+git clone https://github.com/jinjin1/gamma-portfolio-plugin.git
 claude --plugin-dir ./gamma-portfolio-plugin
 ```
 
@@ -38,13 +44,13 @@ claude --plugin-dir ./gamma-portfolio-plugin
 /gamma-portfolio:portfolio
 ```
 
-The skill will guide you through:
+The skill guides you through:
 
 1. **API key setup** — set `GAMMA_API_KEY` environment variable
 2. **Resume input** — paste text or provide a file path (.txt, .md, .pdf)
-3. **Style selection** — choose format (webpage/presentation/document) and style (professional/casual/creative)
+3. **Style selection** — choose format and style
 4. **Generation** — calls Gamma API and polls for completion
-5. **Result** — provides the portfolio URL and PDF download link
+5. **Result** — portfolio URL and PDF download link
 
 ## API Key Setup
 
@@ -52,18 +58,7 @@ The skill will guide you through:
 export GAMMA_API_KEY="your-api-key"
 ```
 
-Get your API key from: Gamma > Account Settings > API Keys
-
-## Gamma API Parameters Used
-
-| Parameter | Value |
-|-----------|-------|
-| `textMode` | `generate` |
-| `cardSplit` | `inputTextBreaks` |
-| `textOptions.amount` | `medium` |
-| `textOptions.language` | `ko` |
-| `imageOptions.source` | `aiGenerated` |
-| `exportAs` | `pdf` |
+Get your API key from: [Gamma](https://gamma.app) > Account Settings > API Keys
 
 ## License
 

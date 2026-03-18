@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "name": "gamma-portfolio",
+      "description": "Generate professional portfolio webpages from resumes using the Gamma API. Supports professional, casual, and creative styles.",
+      "version": "1.0.0",
+      "source": "."
+    }
+  ]
+}
