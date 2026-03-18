@@ -5,9 +5,6 @@
   "author": {
     "name": "Yongjin Jin"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jinjin1/gamma-portfolio-plugin"
-  },
+  "repository": "https://github.com/jinjin1/gamma-portfolio-plugin",
   "license": "MIT"
 }
